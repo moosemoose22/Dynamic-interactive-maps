@@ -1,7 +1,7 @@
 
 CREATE TABLE countries (
-	id				serial,
-	name			varchar NOT NULL,
+	id				char(3),
+	place_name		varchar NOT NULL,
 	geometry		geometry(MultiPolygon,4326),
 	shape_length	double precision,
 	shape_area		double precision,
@@ -9,8 +9,8 @@ CREATE TABLE countries (
 );
 CREATE TABLE admin1Regions (
 	id				serial,
-	country_id		integer,
-	name			varchar(50) NOT NULL,
+	country_id		char(3),
+	place_name		varchar(50) NOT NULL,
 	geometry		geometry(MultiPolygon,4326),
 	shape_length	double precision,
 	shape_area		double precision,
@@ -18,9 +18,8 @@ CREATE TABLE admin1Regions (
 );
 CREATE TABLE admin2Regions (
 	id				serial,
-	country_id		integer,
 	admin1_id		integer,
-	name			varchar(50) NOT NULL,
+	place_name		varchar(50) NOT NULL,
 	geometry		geometry(MultiPolygon,4326),
 	shape_length	double precision,
 	shape_area		double precision,
@@ -28,10 +27,8 @@ CREATE TABLE admin2Regions (
 );
 CREATE TABLE admin3Regions (
 	id				serial,
-	country_id		integer,
-	admin1_id		integer,
 	admin2_id		integer,
-	name			varchar(50) NOT NULL,
+	place_name		varchar(50) NOT NULL,
 	geometry		geometry(MultiPolygon,4326),
 	shape_length	double precision,
 	shape_area		double precision,
@@ -39,13 +36,10 @@ CREATE TABLE admin3Regions (
 );
 CREATE TABLE cities (
 	id				serial,
-	country_id		integer,
-	admin1_id		integer,
-	admin2_id		integer,
 	admin3_id		integer,
-	name			varchar(50) NOT NULL,
-	lat				double precision,
-	long			double precision,
+	place_name		varchar(50) NOT NULL,
+	latitude		double precision,
+	longitude		double precision,
 	population		integer
 );
 CREATE TABLE languages (
