@@ -10,7 +10,7 @@ http://gis.stackexchange.com/questions/19432/why-does-postgis-installation-not-c
 
 sudo su postgres
 
-# Didn't do any of these on Ubuntu 16
+Didn't do any of these on Ubuntu 16:
 createdb template_postgis
 createlang plpgsql template_postgis
 psql -d template_postgis -f /usr/share/postgresql/9.5/contrib/postgis-2.2/postgis.sql
@@ -46,3 +46,7 @@ http://expressjs.com/en/guide/database-integration.html#postgres
 ogr2ogr -f PostgreSQL PG:dbname=maps FRA_adm.gdb
 
 psql -U zion -d maps < migrate.sql
+
+
+Once everything's set up, you can create admin2 topojson by running this:  
+nodejs makeCountryAreaGEOJson.js FRA
