@@ -11,7 +11,7 @@ exports.getFeatureResult = function(result, spatialcolName) {
 		if (result.hasOwnProperty(k))
 		{
 			var nm = "" + k;
-			if (k != spatialcolName)
+			if (k != spatialcolName && result[k])
 				props[nm] = result[k];
 		}
 	}
@@ -20,7 +20,7 @@ exports.getFeatureResult = function(result, spatialcolName) {
 		type : "Feature",
 		//crs : crsobj,
 		properties : props,
-		geometry : JSON.parse(result.admin2Geom)
+		geometry : JSON.parse(result[spatialcolName])
 	};
 };
 

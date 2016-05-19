@@ -10,23 +10,15 @@ exports.createCountryAreaGEOJson = function(countryISO) {
 		// reject and resolve are functions provided by the Promise
 		// implementation. Call only one of them.
 
-		var db_query =
-			"SELECT countries.place_name as \"countryName\", admin1Regions.place_name as \"admin1Name\", " +
-			"admin2Regions.place_name as \"admin2Name\", ST_AsGEOJSON(admin2Regions.geometry) AS \"admin2Geom\" " +
-			"FROM countries " +
-			"INNER JOIN admin1Regions " +
-			"ON countries.id = admin1Regions.country_id " +
-			"INNER JOIN admin2Regions ON admin2Regions.admin1_id = admin1Regions.id " +
-			"WHERE countries.id = '" + countryISO + "';";
 
 		// 1 or more rows
-		db.many(db_query, 123)
+		db.func("country_area_data_adm2_or_best_available", [countryISO, true])
 			.then(function (data) {
 				
 				var geoJSONArr = [];
 				data.forEach(function(row, index, array)
 				{
-					geoJSONArr.push(db_funcs.getFeatureResult(row, "admin2Geom"));
+					geoJSONArr.push(db_funcs.getFeatureResult(row, "regionGeom"));
 				});
 				var GEOJsonFileName = countryISO.toLowerCase() + ".adm2.geo.json";
 				module.exports.deleteCountryAreaGEOJson(GEOJsonFileName);
@@ -41,6 +33,8 @@ exports.createCountryAreaGEOJson = function(countryISO) {
 				});
 			})
 			.catch(function (error) {
+				console.log("moo");
+				console.log(error);
 				return reject("No results for country " + countryISO);
 			});
 	});
