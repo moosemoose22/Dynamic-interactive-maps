@@ -36,11 +36,14 @@ CREATE TABLE admin3Regions (
 );
 CREATE TABLE cities (
 	id				serial,
+	country_id		char(3),
 	admin3_id		integer,
 	place_name		varchar(50) NOT NULL,
+	geometry		geometry(Point,4326),
 	latitude		double precision,
 	longitude		double precision,
-	population		integer
+	population		integer,
+	align_name		varchar(7)	
 );
 CREATE TABLE languages (
 	id				serial,

@@ -14,7 +14,7 @@ exports.createCountryAreaGEOJson = function(countryISO) {
 		// 1 or more rows
 		db.func("country_area_data_adm2_safe", [countryISO, true])
 			.then(function (data) {
-				
+
 				var geoJSONArr = [];
 				data.forEach(function(row, index, array)
 				{

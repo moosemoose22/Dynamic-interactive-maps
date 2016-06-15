@@ -1,8 +1,8 @@
 # Dynamic-interactive-maps
 A map generation system to allow storage, editing, and viewing of various data associated with places in the world. The focus for now will be on France and Spain.
 
-psql -U postgres -d postgres -a -f createTables.sql 
-
+psql -U postgres -d postgres -a -f createTables.sql  
+psql -U zion -d maps < createTables.sql  
 
 ogrinfo FRA_adm1.shp -geom=YES -sql "SELECT NAME_1, SHAPE FROM FRA_adm1" | grep "NAME_1 (String)" | sed 's/  NAME_1 (String) = //g' | sed "s/'/_/g" | sed "s/ /_/g" | awk '{printf "INSERT INTO countries (name) VALUES (\x27"$0"\x27);\n"}'
 
@@ -50,3 +50,7 @@ psql -U zion -d maps < migrate.sql
 
 Once everything's set up, you can create admin2 topojson by running this:  
 nodejs makeCountryAreaGEOJson.js FRA
+
+##### Cities
+npm install csv  
+

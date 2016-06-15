@@ -11,16 +11,16 @@ if (!countryISO)
 	process.exit();
 }
 
+// Get all country admin2 data
 var GEOJsonFileNamePromise = json_funcs.createCountryAreaGEOJson(countryISO);
+// GEOJsonFileName is the parameter that the promise passes to us
 GEOJsonFileNamePromise.then(GEOJsonFileName => {
-	var topojson_cmd = "topojson --simplify-proportion .25 " +
-						"-o " + countryISO + ".adm2.topo.json " +
-						"--properties Cntry=ISO,regionname=NAME_1,regionID=ID_1,subregionname=NAME_2,subregionID=ID_2,region=HASC_2 " +
-						"admin2=" + GEOJsonFileName;
+	// This topojson command creates the d3 map javascript file for the country
 	const make_topojson = spawn('topojson', ['--simplify-proportion', '.25', '-o', countryISO.toLowerCase() + ".adm2.topo.json", '--properties Cntry=ISO,regionname=NAME_1,regionID=ID_1,subregionname=NAME_2,subregionID=ID_2,region=HASC_2', "admin2=" + GEOJsonFileName]);
 
 	make_topojson.stdout.on('data', (data) => {
 		console.log("Created topojson for country " + countryISO);
+		// Once we've created the topojson, let's delete the GEOJson that isn't being used in the final web product
 		json_funcs.deleteCountryAreaGEOJson(GEOJsonFileName);
 		process.exit(0);
 	});
