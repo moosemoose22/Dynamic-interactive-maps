@@ -13,6 +13,7 @@ Once all the d3 topojson is generated from a database, we can:
 1) Fix incorrect data and re-generate  
 2) Add other data-- such as GDP-- and regenerate. This makes the map so much more powerful as a presentation tool.  
 
+### You may need to install the following to use this  
 ##### Install pg so nodeJS can connect to postgres
 npm install pg --save
 
@@ -20,9 +21,9 @@ npm install pg --save
 sudo npm install -g express-generator
 
 
-Once everything's set up, you can create admin2 topojson by running this:  
-nodejs makeCountryAreaGEOJson.js FRA
-
-##### Cities
-npm install csv  
+### To create web-ready topojson for a country in the db  
+For France, for example, run:  
+nodejs makeCountryAreaGEOJson.js FRA  
+I've also been working with:  
+Spain (ESP), Andorra (AND), and Monaco (MCO)
 
