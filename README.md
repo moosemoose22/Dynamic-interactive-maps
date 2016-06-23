@@ -23,7 +23,7 @@ sudo npm install -g express-generator
 
 ### To create web-ready topojson for a country in the db  
 For France, for example, run:  
-nodejs makeCountryAreaGEOJson.js FRA  
+nodejs [makeCountryAreaGEOJson.js](db/makeCountryAreaGEOJson.js) FRA  
 I've also been working with:  
 Spain (ESP), Andorra (AND), and Monaco (MCO)
 
