@@ -3,7 +3,7 @@ var parse = require('csv-parse');
 
 var pgp = require("pg-promise")(/*options*/);
 var db = pgp("postgres://zion:zion@localhost/maps");
-var db_funcs = require('../db/db_funcs');
+var db_funcs = require('../../db/db_funcs');
 
 var csvData=[];
 var country_id = 'ESP';
