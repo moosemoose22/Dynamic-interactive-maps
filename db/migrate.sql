@@ -109,20 +109,40 @@ BEGIN
 
 	RAISE NOTICE 'Reading admin3 data';
 	FOR admin2data IN SELECT admin2Regions.id, admin2Regions.place_name as admin2place,
+	admin2Regions.geometry as admin2area,
 	admin1Regions.place_name as admin1place
 	FROM admin2Regions 
 	INNER JOIN admin1Regions ON admin2Regions.admin1_id = admin1Regions.id
 	LOOP
-		FOR admin3data IN EXECUTE format('SELECT name_3, wkb_geometry, shape_length, shape_area FROM %s '
-		'WHERE name_1 = %L AND name_2 = %L AND iso = %L', gadm_table_name, admin2data.admin1place, admin2data.admin2place, country_iso)
-		LOOP
-			-- Now "admin2data" has one record from cs_materialized_views
-			INSERT INTO admin3Regions(admin2_id, place_name, geometry, shape_length, shape_area)
-			VALUES (admin2data.id, admin3data.name_3, admin3data.wkb_geometry, admin3data.shape_length,
-			admin3data.shape_area);
+		--FOR admin3data IN EXECUTE format('SELECT name_3, wkb_geometry, shape_length, shape_area FROM %s '
+		--'WHERE name_1 = %L AND name_2 = %L AND iso = %L', gadm_table_name, admin2data.admin1place, admin2data.admin2place, country_iso)
+		
+		-- NOTE: 
+		-- Converting from geometry to text and back wasn't that accurate.
+		-- So for now we have a large if and duplicate data; however it works.
+		IF country_iso = 'ESP' THEN
+			FOR admin3data IN SELECT name_3, wkb_geometry, shape_length, shape_area FROM esp_adm3
+			WHERE ST_Within(wkb_geometry, admin2data.admin2area)
+			LOOP
+				-- Now "admin2data" has one record from cs_materialized_views
+				INSERT INTO admin3Regions(admin2_id, place_name, geometry, shape_length, shape_area)
+				VALUES (admin2data.id, admin3data.name_3, admin3data.wkb_geometry, admin3data.shape_length,
+				admin3data.shape_area);
 
-			RAISE NOTICE 'Added admin3 region % in admin2 region %', admin3data.name_3, admin2data.admin2place;
-		END LOOP;
+				RAISE NOTICE 'Added admin3 region % in admin2 region %', admin3data.name_3, admin2data.admin2place;
+			END LOOP;
+		ELSEIF country_iso = 'FRA' THEN
+			FOR admin3data IN SELECT name_3, wkb_geometry, shape_length, shape_area FROM fra_adm3
+			WHERE ST_Within(wkb_geometry, admin2data.admin2area)
+			LOOP
+				-- Now "admin2data" has one record from cs_materialized_views
+				INSERT INTO admin3Regions(admin2_id, place_name, geometry, shape_length, shape_area)
+				VALUES (admin2data.id, admin3data.name_3, admin3data.wkb_geometry, admin3data.shape_length,
+				admin3data.shape_area);
+
+				RAISE NOTICE 'Added admin3 region % in admin2 region %', admin3data.name_3, admin2data.admin2place;
+			END LOOP;
+		END IF;
 	END LOOP;
 
 	RAISE NOTICE 'Done reading admin3 data';
