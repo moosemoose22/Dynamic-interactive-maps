@@ -8,16 +8,17 @@ var db_funcs = require('./db_funcs');
 var csvData=[];
 //var inputFile='franceCities/outputNewFranceInseeWithLatLng10000.csv';
 //var inputFile='franceCities/outputNewFranceInseeWithLatLng.csv';
-var inputFile='franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
-//var inputFile='spainCities/outputNewSpainIneWithLatLng.csv';
+//var inputFile='franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
+var country_id = 'FRA';
+var inputFile='spainCities/outputNewSpainIneWithLatLng.csv';
 //var inputFile='spainCities/outputNewSpainIneWithLatLng1000To10000.csv';
+country_id = 'ESP';
 fs.createReadStream(inputFile)
 .pipe(parse({delimiter: ','}))
 .on('data', function(csvrow) {
 	console.log(csvrow[0]);
 	//do something with csvrow
 	csvData.push(csvrow);
-	
 })
 .on('end',function() {
 	//Auvergne Rhône-Alpes,Isere,,Voiron,19988,45.362713,5.591349,default
@@ -25,14 +26,16 @@ fs.createReadStream(inputFile)
 	//Île-de-France,Yvelines,Villepreux,9975,48.8301019,2.005269,default
 	//Euskadi,Araba,Kantauri Arabarra,Amurrio,10263,43.0518654,-3.0013109,default
 	//Extremadura,Cáceres,Valle del Jerte,Tornavacas,1144,40.2540625,-5.6898468
+	//Catalunya,Barcelona,El Baix Llobregat,Abrera,12071,41.5175266,1.9017802,default
+	//Catalunya,Barcelona,Maresme,Arenys de Mar,15289,41.5797073,2.5508683,default
 	console.log(csvData[0]);
 	db.tx(function (t) {
 		var queries = csvData.map(function (cityRow) {
 			// Note that ST_MakePoint is longitude, latitude!!
-			//return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
-			//	"('FRA', $4, ST_SetSRID(ST_MakePoint($7, $6),4326), $6, $7, $5, $8)", cityRow);
 			return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
-				"('FRA', $3, ST_SetSRID(ST_MakePoint($6, $5),4326), $5, $6, $4, $7)", cityRow);
+				"('" + country_id + "', $4, ST_SetSRID(ST_MakePoint($7, $6),4326), $6, $7, $5, $8)", cityRow);
+			//return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
+			//	"('" + country_id + "', $3, ST_SetSRID(ST_MakePoint($6, $5),4326), $5, $6, $4, $7)", cityRow);
 		});
 		return t.batch(queries);
 	})
