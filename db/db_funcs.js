@@ -1,4 +1,4 @@
-exports.getFeatureResult = function(result, spatialcolName) {
+exports.getFeatureResult = function(result, spatialcolName, isCity) {
 	var props = new Object;
 	var crsobj = {
 		"type" : "name",
@@ -16,11 +16,21 @@ exports.getFeatureResult = function(result, spatialcolName) {
 		}
 	}
 
+	var geometryContent;
+	if (isCity)
+	{
+		geometryContent = {
+		   "type": "Point",
+		   "coordinates":  [ result.latitude, result.longitude ]
+		};
+	}
+	else
+		geometryContent = JSON.parse(result[spatialcolName]);
 	return {
 		type : "Feature",
 		//crs : crsobj,
 		properties : props,
-		geometry : JSON.parse(result[spatialcolName])
+		geometry : geometryContent
 	};
 };
 

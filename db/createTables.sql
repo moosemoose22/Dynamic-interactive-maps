@@ -43,7 +43,8 @@ CREATE TABLE cities (
 	latitude		double precision,
 	longitude		double precision,
 	population		integer,
-	align_name		varchar(7)	
+	align_name		varchar(7),
+	show_on_landing	boolean
 );
 CREATE TABLE languages (
 	id				serial,
