@@ -6,13 +6,21 @@ var db = pgp("postgres://zion:zion@localhost/maps");
 var db_funcs = require('./db_funcs');
 
 var csvData=[];
-//var inputFile='franceCities/outputNewFranceInseeWithLatLng10000.csv';
-//var inputFile='franceCities/outputNewFranceInseeWithLatLng.csv';
-//var inputFile='franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
+var inputFile='franceCities/outputNewFranceInseeWithLatLng10000.csv';
+inputFile='franceCities/outputNewFranceInseeWithLatLng.csv';
+inputFile='franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
 var country_id = 'FRA';
-var inputFile='spainCities/outputNewSpainIneWithLatLng.csv';
-//var inputFile='spainCities/outputNewSpainIneWithLatLng1000To10000.csv';
+
+inputFile='spainCities/outputNewSpainIneWithLatLng1000To10000.csv';
+inputFile='spainCities/outputNewSpainIneWithLatLng.csv';
 country_id = 'ESP';
+
+inputFile='andorra.csv';
+country_id = 'AND';
+
+inputFile='monaco.csv';
+country_id = 'MCO';
+
 fs.createReadStream(inputFile)
 .pipe(parse({delimiter: ','}))
 .on('data', function(csvrow) {
@@ -31,11 +39,28 @@ fs.createReadStream(inputFile)
 	console.log(csvData[0]);
 	db.tx(function (t) {
 		var queries = csvData.map(function (cityRow) {
+
 			// Note that ST_MakePoint is longitude, latitude!!
-			return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
-				"('" + country_id + "', $4, ST_SetSRID(ST_MakePoint($7, $6),4326), $6, $7, $5, $8)", cityRow);
-			//return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
-			//	"('" + country_id + "', $3, ST_SetSRID(ST_MakePoint($6, $5),4326), $5, $6, $4, $7)", cityRow);
+
+			if (country_id == 'AND')
+			{
+				//Andorra la Vella,Andorra la Vella,20430,42.506317,1.521835,default
+				return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, text_position) VALUES " +
+					"('" + country_id + "', $2, ST_SetSRID(ST_MakePoint($5, $4),4326), $4, $5, $3, $6)", cityRow);
+			}
+			else if (country_id == 'MCO')
+			{
+				//Monaco,37831,43.7384,7.4246,default
+				return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, text_position) VALUES " +
+					"('" + country_id + "', $1, ST_SetSRID(ST_MakePoint($4, $3),4326), $3, $4, $2, $5)", cityRow);
+			}
+			else
+			{
+				return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, text_position) VALUES " +
+					"('" + country_id + "', $4, ST_SetSRID(ST_MakePoint($7, $6),4326), $6, $7, $5, $8)", cityRow);
+				//return t.none("INSERT INTO cities(country_id, place_name, geometry, latitude, longitude, population, align_name) VALUES " +
+				//	"('" + country_id + "', $3, ST_SetSRID(ST_MakePoint($6, $5),4326), $5, $6, $4, $7)", cityRow);
+			}
 		});
 		return t.batch(queries);
 	})

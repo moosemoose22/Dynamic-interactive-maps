@@ -21,7 +21,7 @@ exports.getFeatureResult = function(result, spatialcolName, isCity) {
 	{
 		geometryContent = {
 		   "type": "Point",
-		   "coordinates":  [ result.latitude, result.longitude ]
+		   "coordinates":  [ result.longitude, result.latitude ]
 		};
 	}
 	else
