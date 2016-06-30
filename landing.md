@@ -14,13 +14,13 @@ ogr2ogr -f "PostgreSQL" PG:"dbname=mydbname user=*user*" ESP_adm.gdb
 
 4) Create the tables in the database that will house the gadm data.  
 Here's how I did it:  
-psql -U zion maps < [sql/createTables.sql](sql/createTables.sql)  
+psql -U zion maps < [server/sql/createTables.sql](server/sql/createTables.sql)  
 Note that the user is zion and the database is called maps.  
 maps contains postGIS and all the tables needed for this application.
 
 5) Import the country data.  
 a) First, you need to load some sql helper into the database.  
-psql -U zion maps < [sql/migrate.sql](sql/migrate.sql)  
+psql -U zion maps < [server/sql/migrate.sql](server/sql/migrate.sql)  
 b) Run the database migration functions  
 Log into the database command-line:  
 psql -U zion maps  
@@ -36,19 +36,19 @@ replace country_iso with the 3-letter country iso.
 6) Import city data  
 There are detailed instructions on how to get city data [here](https://github.com/moosemoose22/Visual-history-of-Occitania/blob/master/landing.md#now-we-need-to-get-the-city-data).  
 To import the city data from these pre-made csv files, run  
-nodejs [js/db/importCities.js](js/db/importCities.js) *country_iso*  
-Please note that unless you're importing cities for Andorra or Monaco, you'll have to modify [js/db/importCities.js](js/db/importCities.js) to import the correct file.  
+nodejs [server/js/db/importCities.js](server/js/db/importCities.js) *country_iso*  
+Please note that unless you're importing cities for Andorra or Monaco, you'll have to modify [server/js/db/importCities.js](server/js/db/importCities.js) to import the correct file.  
 
 7) Load required database functions  
-psql -U zion maps < [sql/utils.sql](sql/utils.sql)  
-psql -U zion maps < [sql/cities.sql](sql/cities.sql)  
+psql -U zion maps < [server/sql/utils.sql](server/sql/utils.sql)  
+psql -U zion maps < [server/sql/cities.sql](server/sql/cities.sql)  
 
 8) Initialize city data, such as capitals and city zoom levels.  
 Note that this has been tailored for France, Andorra, Spain, and Monaco.  
-nodejs [js/initCityData.js](js/initCityData.js) FRA  
+nodejs [server/js/initCityData.js](server/js/initCityData.js) FRA  
 
 9) Create web-ready topojson for a country in the db  
 For France, for example, run:  
-nodejs [js/makeCountryAreaGEOJson.js](js/makeCountryAreaGEOJson.js) FRA  
+nodejs [server/js/makeCountryAreaGEOJson.js](server/js/makeCountryAreaGEOJson.js) FRA  
 Other built-in countries include:  
 Spain (ESP), Andorra (AND), and Monaco (MCO)  

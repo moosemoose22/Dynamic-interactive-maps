@@ -4,7 +4,7 @@ var db = pgp("postgres://zion:zion@localhost/maps");
 var db_funcs = require('./GeoJSON_helper_funcs');
 //var db = pgp("postgres://username:password@host:port/database");
 
-exports.mapFileLocation = '../maps/';
+exports.mapFileLocation = '../../ui/maps/';
 
 exports.initCityData = function() {
 	return new Promise((resolve, reject) => {

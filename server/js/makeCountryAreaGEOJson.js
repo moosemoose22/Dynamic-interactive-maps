@@ -16,7 +16,7 @@ var GEOJsonFileNamePromise = json_funcs.createCountryAreaGEOJson(countryISO);
 // GEOJsonFileName is the parameter that the promise passes to us
 GEOJsonFileNamePromise.then(GEOJsonFileName => {
 	// This topojson command creates the d3 map javascript file for the country
-	let rootDir = json_funcs.mapFileLocation + countryISO.toLowerCase();
+	var rootDir = json_funcs.mapFileLocation + countryISO.toLowerCase();
 	if (!fs.existsSync(rootDir))
 		fs.mkdirSync(rootDir);
 
