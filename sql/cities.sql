@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION update_cities(country_iso char(3)) RETURNS integer AS $$
+CREATE OR REPLACE FUNCTION update_cities_admin3(country_iso char(3)) RETURNS integer AS $$
 DECLARE
 	citydata RECORD;
 BEGIN
@@ -171,7 +171,38 @@ BEGIN
 	-- Don't show largest cities per admin2 area which are either around Paris or running into other city names on the landing page
 	UPDATE cities
 	SET min_zoom = 7
-	WHERE place_name in ('Boulogne-Billancourt', 'Vitry-sur-Seine', 'Saint-Denis', 'Argenteuil', 'Versailles', 'Le Puy-en-Velay', 'Périgueux');
+	WHERE place_name in ('Boulogne-Billancourt', 'Vitry-sur-Seine', 'Saint-Denis', 'Argenteuil', 'Versailles', 'Le Puy-en-Velay', 'Périgueux', 'Narbonne')
+	AND admin3_id in
+		(select id from admin3regions WHERE admin2_id in
+			(select id from admin2regions where admin1_id in
+				(select id from admin1regions where country_id = 'FRA')
+			)
+		);
+
+
+	-- Manually show smaller cities that are tourist attractions or well-known
+	UPDATE cities
+	SET min_zoom = 0
+	WHERE place_name in ('Carcassonne', 'Biarritz', 'Colmar', 'Chamonix-Mont-Blanc')
+	AND admin3_id in
+		(select id from admin3regions WHERE admin2_id in
+			(select id from admin2regions where admin1_id in
+				(select id from admin1regions where country_id = 'FRA')
+			)
+		);
+
+
+	-- Manually show smaller cities that are tourist attractions or well-known
+	UPDATE cities
+	SET min_zoom = 0
+	WHERE place_name in ('Toledo', 'Benidorm', 'Sitges')
+	AND admin3_id in
+		(select id from admin3regions WHERE admin2_id in
+			(select id from admin2regions where admin1_id in
+				(select id from admin1regions where country_id = 'ESP')
+			)
+		);
+
 
 	RAISE NOTICE 'Done updating city zoom data';
 	RETURN 1;
