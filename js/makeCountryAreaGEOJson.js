@@ -1,7 +1,7 @@
-var json_funcs = require('./json_funcs');
+var fs = require('fs');
+var json_funcs = require('./GeoJSON_funcs');
 
 const spawn = require('child_process').spawn;
-
 
 // Note that the ID for countries is the country ISO
 var countryISO = process.argv[2];
@@ -16,7 +16,11 @@ var GEOJsonFileNamePromise = json_funcs.createCountryAreaGEOJson(countryISO);
 // GEOJsonFileName is the parameter that the promise passes to us
 GEOJsonFileNamePromise.then(GEOJsonFileName => {
 	// This topojson command creates the d3 map javascript file for the country
-	const make_topojson = spawn('topojson', ['--simplify-proportion', '.25', '-o', countryISO.toLowerCase() + ".adm2.topo.json", '--properties Cntry=ISO,regionname=NAME_1,regionID=ID_1,subregionname=NAME_2,subregionID=ID_2,region=HASC_2', "admin2=" + GEOJsonFileName]);
+	let rootDir = json_funcs.mapFileLocation + countryISO.toLowerCase();
+	if (!fs.existsSync(rootDir))
+		fs.mkdirSync(rootDir);
+
+	const make_topojson = spawn('topojson', ['--simplify-proportion', '.25', '-o', rootDir + '/' + countryISO.toLowerCase() + ".adm2.topo.json", '--properties Cntry=ISO,regionname=NAME_1,regionID=ID_1,subregionname=NAME_2,subregionID=ID_2,region=HASC_2', "admin2=" + GEOJsonFileName]);
 
 	make_topojson.stdout.on('data', (data) => {
 		console.log("Created topojson for country " + countryISO);

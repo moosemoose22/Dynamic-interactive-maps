@@ -1,8 +1,27 @@
 var fs = require('fs');
 var pgp = require("pg-promise")(/*options*/);
 var db = pgp("postgres://zion:zion@localhost/maps");
-var db_funcs = require('./db_funcs');
+var db_funcs = require('./GeoJSON_helper_funcs');
 //var db = pgp("postgres://username:password@host:port/database");
+
+exports.mapFileLocation = '../maps/';
+
+exports.initCityData = function() {
+	return new Promise((resolve, reject) => {
+		// reject and resolve are functions provided by the Promise
+		// implementation. Call only one of them.
+
+		// 1 or more rows
+		db.func("init_city_zoom", [])
+			.then(function (data) {
+				return resolve(true);
+			})
+			.catch(function (error) {
+				console.log(error);
+				return reject("Couldn't initialize city data");
+			});
+	});
+};
 
 
 exports.createCountryAreaGEOJson = function(countryISO) {

@@ -6,19 +6,21 @@ var db = pgp("postgres://zion:zion@localhost/maps");
 var db_funcs = require('./db_funcs');
 
 var csvData=[];
-var inputFile='franceCities/outputNewFranceInseeWithLatLng10000.csv';
-inputFile='franceCities/outputNewFranceInseeWithLatLng.csv';
-inputFile='franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
+
+var cityPrefix = '../../cityData/';
+var inputFile = cityPrefix + 'franceCities/outputNewFranceInseeWithLatLng10000.csv';
+inputFile = cityPrefix + 'franceCities/outputNewFranceInseeWithLatLng.csv';
+inputFile = cityPrefix + 'franceCities/outputNewFranceInseeWithLatLng1000to10000.csv';
 var country_id = 'FRA';
 
-inputFile='spainCities/outputNewSpainIneWithLatLng1000To10000.csv';
-inputFile='spainCities/outputNewSpainIneWithLatLng.csv';
+inputFile = cityPrefix + 'spainCities/outputNewSpainIneWithLatLng1000To10000.csv';
+inputFile = cityPrefix + 'spainCities/outputNewSpainIneWithLatLng.csv';
 country_id = 'ESP';
 
-inputFile='andorra.csv';
+inputFile = cityPrefix + 'andorra.csv';
 country_id = 'AND';
 
-inputFile='monaco.csv';
+inputFile = cityPrefix + 'monaco.csv';
 country_id = 'MCO';
 
 fs.createReadStream(inputFile)
