@@ -28,17 +28,17 @@ RETURNS TABLE (
 DECLARE
 	result_count integer;
 BEGIN
-	SELECT count(place_name) INTO result_count FROM admin1Regions WHERE country_id = country_iso;
+	SELECT count(place_name) INTO result_count FROM admin1regions WHERE country_id = country_iso;
 	IF result_count = 0 THEN 
 		RAISE NOTICE 'Skipping admin1 data';
 		RETURN;
 	END IF;
 
-	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin1Regions.geometry) AS "regionGeom",
-	admin1Regions.place_name as "admin1Name"
+	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin1regions.geometry) AS "regionGeom",
+	admin1regions.place_name as "admin1Name"
 	FROM countries
-	INNER JOIN admin1Regions
-	ON countries.id = admin1Regions.country_id
+	INNER JOIN admin1regions
+	ON countries.id = admin1regions.country_id
 	WHERE countries.id = country_iso;
 
 	RETURN;
@@ -55,12 +55,12 @@ RETURNS TABLE (
 DECLARE
 	result_count integer;
 BEGIN
-	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin2Regions.geometry) AS "regionGeom",
-	admin1Regions.place_name as "admin1Name", admin2Regions.place_name as "admin2Name"
+	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin2regions.geometry) AS "regionGeom",
+	admin1regions.place_name as "admin1Name", admin2regions.place_name as "admin2Name"
 	FROM countries
-	INNER JOIN admin1Regions
-	ON countries.id = admin1Regions.country_id
-	INNER JOIN admin2Regions ON admin2Regions.admin1_id = admin1Regions.id
+	INNER JOIN admin1regions
+	ON countries.id = admin1regions.country_id
+	INNER JOIN admin2regions ON admin2regions.admin1_id = admin1regions.id
 	WHERE countries.id = country_iso;
 
 	RETURN;
@@ -78,11 +78,11 @@ DECLARE
 	result_count integer;
 	admin2data RECORD;
 BEGIN
-	SELECT count(place_name) INTO result_count FROM admin2Regions WHERE admin1_id IN (SELECT id FROM admin1regions WHERE country_id = country_iso);
+	SELECT count(place_name) INTO result_count FROM admin2regions WHERE admin1_id IN (SELECT id FROM admin1regions WHERE country_id = country_iso);
 	IF result_count = 0 THEN 
 		RAISE NOTICE 'No admin2';
 		IF go_up_a_region_on_empty THEN
-			SELECT count(place_name) INTO result_count FROM admin1Regions WHERE country_id = country_iso;
+			SELECT count(place_name) INTO result_count FROM admin1regions WHERE country_id = country_iso;
 			IF result_count = 0 THEN 
 				RAISE NOTICE 'No admin1';
 				SELECT count(place_name) INTO result_count FROM countries WHERE id = country_iso;
