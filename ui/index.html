@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Occitania</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" type="text/css" href="mapStyles.css">
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="topojson.v1.min.js"></script>
+<script src="js/latinize.js"></script>
+<script src="http://code.jquery.com/jquery-2.2.1.js"></script>
+<script src="js/globals.js"></script>
+<script src="js/landingPage.js"></script>
+<script src="js/occitaniaFuncs.js"></script>
+<script src="js/occitaniaRegions.js"></script>
+<script src="js/selectedRegionManager.js"></script>
+<script>
+	/******** Onload event ********/
+	var calledRegionOpen, calledRegionPrelimClose, calledRegionClose, regionIsOpen;
+	// Events and variables being set on load
+	window.onload = function()
+	{
+		// Choose browser-specific name for end transition
+		var transitions = {
+			"transition"      : "transitionend",
+			"OTransition"     : "oTransitionEnd",
+			"MozTransition"   : "transitionend",
+			"WebkitTransition": "webkitTransitionEnd"
+		}
+		for (var t in transitions)
+		{
+			if (document.body.style[t] !== undefined)
+				transitionEndName = transitions[t];
+		}
+
+		// When we finish closing a region window,
+		// hide the old region 
+		$("#openRegionBG")
+			.on(transitionEndName, function(e){
+				if (calledRegionPrelimClose)
+				{
+					regionIsOpen = false;
+					calledRegionPrelimClose = false;
+					windowManager.closeWindow();
+				}
+				else if (calledRegionClose)
+				{
+					calledRegionClose = false;
+					$("#openRegionBG").css("z-index", "-1");
+					// Hide previously clicked region
+					$( "#" + currentFullRegion + "_copy" ).remove();
+					$("#regionMap").remove();
+				}
+				else if (calledRegionOpen)
+				{
+					calledRegionOpen = false;
+					regionIsOpen = true;
+					$(".openRegionStyle").css("z-index", "1000").css("visibility", "visible");
+					$("#regionZoomAnimationContainer").css("visibility", "hidden");
+					$("#openRegionBG").css("background-color", "rgba(255,255,255,0.75)");
+					//$("#regionMap").css("visibility", "visible");
+					//console.log(currentFullRegion);
+				}
+			});
+		$(window).scroll(function()
+		{
+			if (!regionIsOpen)
+			{
+				$("#openRegionBG")
+					.css("animation-duration", "0s")
+					.css("-webkit-animation-duration", "0s")
+					.css("transform", "translateY(" + ($(window).scrollTop() * -1) + "px)");
+			}
+		});
+	}
+	/******** End onload event ********/
+
+
+	/******** D3 map setup ********/
+	var width = 1300,
+		height = 1300;
+
+	// Albers equal-area conic projection
+	// From wikipedia: a conic, equal area map projection that uses two standard parallels.
+	// Although scale and shape are not preserved, distortion is minimal between the standard parallels.
+	var projection = d3.geo.albers()
+		.center([0, 43.96])
+		.rotate([1, 0.37])
+		.parallels([50, 60])
+		.scale(1200 * 4)
+		.translate([600, 630]);
+
+	// Create a new geographic path generator
+	// and set the projection used by the path generator what we specified above.
+	// If projection is not specified, returns the current projection, which defaults to albersUsa.
+	var path = d3.geo.path()
+		.projection(projection)
+		.pointRadius(2.4);
+
+	// Append default svg
+	var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.attr("id", "mainD3Map");
+
+	// write map, then cities, so map doesn't cover cities
+	landingPage.init();
+	/******** End D3 map setup ********/
+</script>
+
+<div class="regionNameContainer">
+	<h2 id="regionName">&nbsp;</h2>
+	<h3 id="subRegionName">&nbsp;</h3>
+	<h4 id="subSubRegionName">&nbsp;</h4>
+	<h5 id="CityName">&nbsp;</h5>
+</div>
+
+<img id="closeButtonObj" class="closeButton" src="img/fileclose.png" onclick="windowManager.closeWindowPrelim()" />
+<svg id="openRegionBG" class="openWindowStyle" width="2000" height="1500" viewBox="0 0 2000 1500">
+</svg>
+<svg id="openRegionContainer" class="openRegionStyle" width="2000" height="1500" viewBox="0 0 2000 1500">
+</svg>
+</body>
+</html>
