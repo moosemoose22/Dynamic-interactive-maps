@@ -3,36 +3,6 @@ var transitionEndName;
 var currentRegion, currentFullRegion;
 var currentLeftOffset, currentTopOffset, currentScaling;
 
-function convertRegionName(regionname)
-{
-	var convertRegionObj = {};
-	convertRegionObj["pais_vasco"] = "euskadi";
-	convertRegionObj["comunidad_foral_de_navarra"] = "navarra";
-	convertRegionObj["ceuta_y_melilla"] = "ceuta";
-	convertRegionObj["cataluna"] = "catalunya";
-	convertRegionObj["castile_and_leon"] = "castilla_y_leon";
-	convertRegionObj["islas_baleares"] = "illes_balears";
-	
-	if (regionname in convertRegionObj)
-		return convertRegionObj[regionname];
-	else
-		return regionname;
-}
-
-function convertSubRegionName(subregionname)
-{
-	var convertSubRegionObj = {};
-	convertSubRegionObj["alava"] = "araba";
-	convertSubRegionObj["guipuzcoa"] = "gipuzkoa";
-	convertSubRegionObj["vizcaya"] = "bizkaia";
-	convertSubRegionObj["baleares"] = "illes_balears";
-	
-	if (subregionname in convertSubRegionObj)
-		return convertSubRegionObj[subregionname];
-	else
-		return subregionname;
-}
-
 // Convert coordinates in topojson file to screen coordinates
 function getLargeMapCoords(mapPoints, position)
 {
@@ -89,7 +59,7 @@ var windowManager = new function()
 			// Once we're done reading the data from the topoJSON file, we add cities
 			// This needs to be done in a callback since reading the file is asynchronous
 			var regionCallback = regionFuncs.addCities;
-			regionFuncs.init(mapCountry, data.properties.regionID, convertRegionName(regionName) + "_" + convertSubRegionName(subRegionName), regionCallback);
+			regionFuncs.init(mapCountry, data.properties.regionID, regionName + "_" + subRegionName, regionCallback);
 		}
 
 		var countryAbbrev = data.properties.ISO;
