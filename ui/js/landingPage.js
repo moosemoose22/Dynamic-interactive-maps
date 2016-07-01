@@ -14,7 +14,9 @@ var landingPage = new function()
 		console.log(mapCountry);
 		var mapLoc;
 		var mapLocPrefix = "maps/" + mapCountry + "/" + mapCountry;
-		if (mapCountry == "and" || mapCountry == "mco")
+		if (mapCountry == "and")
+			mapLoc = mapLocPrefix + ".adm1.topo.json";
+		else if (mapCountry == "mco")
 			mapLoc = mapLocPrefix + ".adm0.topo.json";
 		else
 			mapLoc = mapLocPrefix + ".adm2.topo.json";
@@ -53,7 +55,7 @@ var landingPage = new function()
 					selectedRegionManager.writeData();
 				})
 				.on('click', function(d){
-					windowManager.openRegionWindow(mapCountry, d);
+					windowManager.openRegionWindow(d);
 				});
 			
 			if (callback)

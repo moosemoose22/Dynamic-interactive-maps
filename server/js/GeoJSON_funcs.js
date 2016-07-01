@@ -5,7 +5,7 @@ var db_funcs = require('./GeoJSON_helper_funcs');
 //var db = pgp("postgres://username:password@host:port/database");
 
 exports.mapFileLocation = '../../ui/maps/';
-exports.subRegionMapFileLocation = '../../ui/maps/*country*/';
+exports.subRegionMapFileLocation = '../../ui/maps/*country*/regions/';
 
 exports.initCityData = function() {
 	return new Promise((resolve, reject) => {
@@ -39,16 +39,26 @@ exports.createCountryAreaGEOJson = function(countryISO) {
 				{
 					geoJSONArr.push(db_funcs.getFeatureResult(row, "regionGeom", false));
 				});
-				var GEOJsonFileName = countryISO.toLowerCase() + ".adm2.geo.json";
-				module.exports.deleteCountryAreaGEOJson(GEOJsonFileName);
+				var JSONFilePrefix = "";
+				if (data.length > 0)
+				{
+					if (data[0]["admin1Name"] == null)
+						JSONFilePrefix = "adm0";
+					else if (data[0]["admin2Name"] == null)
+						JSONFilePrefix = "adm1";
+					else
+						JSONFilePrefix = "adm2";
+				}
+				var GeoJSONFileName = countryISO.toLowerCase() + "." + JSONFilePrefix + ".geo.json";
+				module.exports.deleteCountryAreaGEOJson(GeoJSONFileName);
 
 				var finalJSON = db_funcs.getFeatureContainer(geoJSONArr);
-				fs.writeFile(GEOJsonFileName, JSON.stringify(finalJSON), 'utf8', function(err)
+				fs.writeFile(GeoJSONFileName, JSON.stringify(finalJSON), 'utf8', function(err)
 				{
 					if (err)
 						return reject(err);
 					else
-						return resolve(GEOJsonFileName);
+						return resolve(JSONFilePrefix);
 				});
 			})
 			.catch(function (error) {
@@ -72,7 +82,7 @@ exports.createPopulationGEOJson = function() {
 				var geoJSONArr = [];
 				data.forEach(function(row, index, array)
 				{
-					geoJSONArr.push(db_funcs.getFeatureResult(row, "regiongeom", true));
+					geoJSONArr.push(db_funcs.getFeatureResult(row, "", true));
 				});
 				var GEOJsonFileName = "landingpage.population.geo.json";
 				module.exports.deleteCountryAreaGEOJson(GEOJsonFileName);
@@ -85,6 +95,32 @@ exports.createPopulationGEOJson = function() {
 					else
 						return resolve(GEOJsonFileName);
 				});
+			})
+			.catch(function (error) {
+				console.log(error);
+				return reject("No results for landing page population");
+			});
+	});
+};
+
+
+exports.getRegionPopulationGeoJSON = function(countryISO, admin2_ID) {
+	return new Promise((resolve, reject) => {
+		// reject and resolve are functions provided by the Promise
+		// implementation. Call only one of them.
+		
+		// 1 or more rows
+		db.func("city_data_adm3", [countryISO, admin2_ID])
+			.then(function (data) {
+
+				var geoJSONArr = [];
+				data.forEach(function(row, index, array)
+				{
+					geoJSONArr.push(db_funcs.getFeatureResult(row, "", true));
+				});
+
+				var finalJSON = db_funcs.getFeatureContainer(geoJSONArr);
+				return resolve(finalJSON);
 			})
 			.catch(function (error) {
 				console.log(error);

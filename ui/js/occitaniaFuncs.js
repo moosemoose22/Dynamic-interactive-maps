@@ -62,11 +62,11 @@ function getLargeMapCoords(mapPoints, position)
 // Open region detail window when clicking on region on map
 var windowManager = new function()
 {
-	this.openRegionWindow = function(mapCountry, data)
+	this.openRegionWindow = function(data)
 	{
+		var mapCountry = data.properties.Cntry.toLowerCase();
 		calledRegionOpen = true;
 		var id = mapCountry + "_" + data.properties.regionname + "_" + data.properties.subregionname;
-		console.log(convertID(data.properties.regionname + "_" + data.properties.subregionname));
 		id = convertID(id);
 		currentRegion = data.properties.regionname;
 		currentFullRegion = id;
@@ -85,15 +85,14 @@ var windowManager = new function()
 		{
 			var regionName = convertID(latinize(data.properties.regionname).toLowerCase());
 			var subRegionName = convertID(latinize(data.properties.subregionname).toLowerCase());
-			regionFuncs.init(mapCountry, data.properties.regionID, convertRegionName(regionName) + "_" + convertSubRegionName(subRegionName));
+
+			// Once we're done reading the data from the topoJSON file, we add cities
+			// This needs to be done in a callback since reading the file is asynchronous
+			var regionCallback = regionFuncs.addCities;
+			regionFuncs.init(mapCountry, data.properties.regionID, convertRegionName(regionName) + "_" + convertSubRegionName(subRegionName), regionCallback);
 		}
 
-		var countryAbbrev = data.properties.region;
-		if (countryAbbrev.indexOf(".") !== -1)
-		{
-			var tmp = countryAbbrev.split(".");
-			countryAbbrev = tmp[0];
-		}
+		var countryAbbrev = data.properties.ISO;
 		$("#openRegionBG").html('<g id="regionZoomAnimationContainer"></g>');
 
 		// Clone current region and attach it to regionZoomAnimationContainer
@@ -127,6 +126,7 @@ var windowManager = new function()
 	// of region detail window
 	this.closeWindowPrelim = function()
 	{
+		regionFuncs.reset();
 		calledRegionPrelimClose = true;
 		$(".openRegionStyle").css("z-index", "-1").css("visibility", "hidden");
 		$("#regionZoomAnimationContainer").css("visibility", "visible");

@@ -1,3 +1,13 @@
+---------------------------------------------------------
+--
+-- Functions to link cities to regions
+-- Countries that have no admin2 regions, such as Andorra,
+-- use update_cities_admin1.
+-- Most countries use update_cities_admin3.
+-- I ran these manually in the beginning.
+-- TODO: Add these to an initialization function.
+--
+---------------------------------------------------------
 CREATE OR REPLACE FUNCTION update_cities_admin3(country_iso char(3)) RETURNS integer AS $$
 DECLARE
 	citydata RECORD;
@@ -75,6 +85,16 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+---------------------------------------------------------
+--
+-- We had 2 possible problems with linking cities to regions
+-- a) Sometimes admin3 regions were missing or inaccurate
+-- b) ST_Within, the PostGIS function to determine whether 1 geometry is in another, doesn't always work.
+-- The function below manually fixes some of the problems.
+-- Any future fixes that are needed should go here.
+-- TODO: Add this to an initialization function.
+--
+---------------------------------------------------------
 CREATE OR REPLACE FUNCTION fix_rando_city_data() RETURNS integer AS $$
 DECLARE
 	citydata RECORD;
@@ -105,6 +125,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+---------------------------------------------------------
+--
+-- Run from the nodeJS file initCityData.js
+-- min_zoom tells us what cities to show on the landing page
+-- and in the zoomed-in regions.
+-- If/when zoom is added to the zoomed-in regions, we'll use it there too.
+--
+---------------------------------------------------------
 CREATE OR REPLACE FUNCTION init_city_zoom() RETURNS integer AS $$
 DECLARE
 	citydataOuter RECORD;
@@ -210,6 +238,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+---------------------------------------------------------
+--
+-- Function name says it all
+-- Run from makeCityGEOJson.js
+--
+---------------------------------------------------------
 CREATE OR REPLACE FUNCTION get_landingpage_cities()
 RETURNS TABLE (
 	"admin1name"  varchar,
@@ -252,3 +286,57 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+---------------------------------------------------------
+--
+-- Functions to get cities for individual GeoJSON region files
+--
+---------------------------------------------------------
+CREATE OR REPLACE FUNCTION city_data_adm1(country_iso char(3))
+RETURNS TABLE (
+	"admin1name"  varchar,
+	"cityname"  varchar,
+	"latitude"  double precision,
+	"longitude"  double precision,
+	"citypopulation"  int,
+	"capital"  boolean,
+	"textposition"  varchar) AS $$
+BEGIN
+	RETURN QUERY
+	(
+		SELECT countries.place_name as "countryName", admin1regions.place_name as "admin1Name",
+		cities.place_name as "cityName", latitude, longitude, cities.population, cities.capital, cities.text_position
+		FROM countries
+		INNER JOIN admin1regions ON countries.id = admin1regions.country_id
+		INNER JOIN cities ON cities.admin1_id = admin1regions.id
+		WHERE countries.id = country_iso
+	);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION city_data_adm3(country_iso char(3), admin2ID int)
+RETURNS TABLE (
+	"admin1name"  varchar,
+	"admin2name"  varchar,
+	"admin3name"  varchar,
+	"cityname"  varchar,
+	"latitude"  double precision,
+	"longitude"  double precision,
+	"citypopulation"  int,
+	"capital"  boolean,
+	"textposition"  varchar) AS $$
+BEGIN
+	RETURN QUERY
+	(
+		SELECT admin1regions.place_name as "admin1Name", admin2regions.place_name as "admin2Name", admin3regions.place_name as "admin3Name",
+		cities.place_name as "cityName", cities.latitude, cities.longitude, cities.population, cities.capital, cities.text_position
+		FROM countries
+		INNER JOIN admin1regions ON countries.id = admin1regions.country_id
+		INNER JOIN admin2regions ON admin2regions.admin1_id = admin1regions.id
+		INNER JOIN admin3regions ON admin3regions.admin2_id = admin2regions.id
+		INNER JOIN cities ON cities.admin3_id = admin3regions.id
+		WHERE countries.id = country_iso and admin2regions.id = admin2ID
+	);
+END;
+$$ LANGUAGE plpgsql;

@@ -1,5 +1,24 @@
+CREATE OR REPLACE FUNCTION init_regions()
+RETURNS integer AS $$
+BEGIN
+	-- admin1 regions
+	UPDATE admin1regions SET place_name = 'Euskadi' WHERE place_name = 'País Vasco' AND country_id = 'ESP';
+	UPDATE admin1regions SET place_name = 'Catalunya' WHERE place_name = 'Cataluña' AND country_id = 'ESP';
+	UPDATE admin1regions SET place_name = 'Illes Balears' WHERE place_name = 'Islas Baleares' AND country_id = 'ESP';
+
+	-- admin2 regions
+	UPDATE admin2regions SET place_name = 'Araba' WHERE place_name = 'Álava' AND admin1_id in (select id from admin1regions where place_name like '%Euskadi%' AND country_id = 'ESP');
+	UPDATE admin2regions SET place_name = 'Gipuzkoa' WHERE place_name = 'Guipúzcoa' AND admin1_id in (select id from admin1regions where place_name like '%Euskadi%' AND country_id = 'ESP');
+	UPDATE admin2regions SET place_name = 'Bizkaia' WHERE place_name = 'Vizcaya' AND admin1_id in (select id from admin1regions where place_name like '%Euskadi%' AND country_id = 'ESP');
+
+	RETURN 1;
+END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION country_area_data_adm0(country_iso char(3))
 RETURNS TABLE (
+	"countryISO"  char,
 	"countryName"  varchar,
 	"regionGeom"   text) AS $$
 DECLARE
@@ -11,7 +30,7 @@ BEGIN
 		RETURN;
 	END IF;
 
-	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(countries.geometry) AS "regionGeom"
+	RETURN QUERY SELECT countries.id as "countryISO", countries.place_name as "countryName", ST_AsGEOJSON(countries.geometry) AS "regionGeom"
 	FROM countries
 	WHERE countries.id = country_iso;
 
@@ -22,6 +41,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION country_area_data_adm1(country_iso char(3))
 RETURNS TABLE (
+	"countryISO"  char,
 	"countryName"  varchar,
 	"regionGeom"   text,
 	"admin1Name"   varchar) AS $$
@@ -34,7 +54,7 @@ BEGIN
 		RETURN;
 	END IF;
 
-	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin1regions.geometry) AS "regionGeom",
+	RETURN QUERY SELECT countries.id as "countryISO", countries.place_name as "countryName", ST_AsGEOJSON(admin1regions.geometry) AS "regionGeom",
 	admin1regions.place_name as "admin1Name"
 	FROM countries
 	INNER JOIN admin1regions
@@ -48,6 +68,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION country_area_data_adm2(country_iso char(3))
 RETURNS TABLE (
+	"countryISO"  char,
 	"countryName"  varchar,
 	"regionGeom"   text,
 	"admin1Name"   varchar,
@@ -55,7 +76,7 @@ RETURNS TABLE (
 DECLARE
 	result_count integer;
 BEGIN
-	RETURN QUERY SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin2regions.geometry) AS "regionGeom",
+	RETURN QUERY SELECT countries.id as "countryISO", countries.place_name as "countryName", ST_AsGEOJSON(admin2regions.geometry) AS "regionGeom",
 	admin1regions.place_name as "admin1Name", admin2regions.place_name as "admin2Name"
 	FROM countries
 	INNER JOIN admin1regions
@@ -70,6 +91,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION country_area_data_adm2_safe(country_iso char(3), go_up_a_region_on_empty boolean)
 RETURNS TABLE (
+	"countryISO"  char,
 	"countryName"  varchar,
 	"regionGeom"   text,
 	"admin1Name"   varchar,

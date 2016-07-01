@@ -3,7 +3,7 @@
 <head>
 	<title>Occitania</title>
 	<meta charset="utf-8" />
-	<link rel="stylesheet" type="text/css" href="mapStyles.css">
+	<link rel="stylesheet" type="text/css" href="occitaniaStyles.css">
 </head>
 <body>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -51,6 +51,7 @@
 					// Hide previously clicked region
 					$( "#" + currentFullRegion + "_copy" ).remove();
 					$("#regionMap").remove();
+					//$("#openRegionContainer").html('');
 				}
 				else if (calledRegionOpen)
 				{
