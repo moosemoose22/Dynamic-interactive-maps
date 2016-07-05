@@ -37,7 +37,7 @@ function parseSubRegionData(subregionDataArr, admin_level)
 		var firstRow = subRegion[0];
 		var fileLoc = json_funcs.subRegionMapFileLocation;
 		
-		var JSONFileNamePrefix = firstRow["countryName"];
+		var JSONFileNamePrefix = countryISO.toLowerCase();
 		if (admin_level > 1)
 			JSONFileNamePrefix += ("." + firstRow["admin1Name"])
 		if (admin_level > 2)
@@ -51,7 +51,7 @@ function parseSubRegionData(subregionDataArr, admin_level)
 
 		console.log("Creating " + GeoJSONFileName);
 
-		fileLoc = fileLoc.replace("*country*", firstRow["countryName"].toLowerCase());
+		fileLoc = fileLoc.replace("*country*", countryISO.toLowerCase());
 		mkdirp.sync(fileLoc);
 		var geoJSONArr = [];
 		subRegion.forEach(function(row, index, array)

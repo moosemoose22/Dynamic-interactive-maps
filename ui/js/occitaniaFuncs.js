@@ -34,7 +34,7 @@ var windowManager = new function()
 {
 	this.openRegionWindow = function(data)
 	{
-		var mapCountry = data.properties.Cntry.toLowerCase();
+		var mapCountry = data.properties.ISO.toLowerCase();
 		calledRegionOpen = true;
 		var id = mapCountry + "_" + data.properties.regionname + "_" + data.properties.subregionname;
 		id = convertID(id);
@@ -51,7 +51,7 @@ var windowManager = new function()
 		currentTopOffset = t[1];
 		currentScaling = s;
 
-		if (mapCountry == "spain" || mapCountry == "france" || mapCountry == "andorra")
+		if (mapCountry == "esp" || mapCountry == "fra" || mapCountry == "and")
 		{
 			var regionName = convertID(latinize(data.properties.regionname).toLowerCase());
 			var subRegionName = convertID(latinize(data.properties.subregionname).toLowerCase());
