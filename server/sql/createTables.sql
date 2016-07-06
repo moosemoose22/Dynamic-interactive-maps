@@ -5,6 +5,7 @@ CREATE TABLE countries (
 	geometry		geometry(MultiPolygon,4326),
 	shape_length	double precision,
 	shape_area		double precision,
+	smallest_admin_division		char(6),
 	population		integer
 );
 CREATE TABLE admin1regions (

@@ -7,7 +7,13 @@ var regionFuncs = new function()
 
 	this.init = function(mapCountry, regionID, subregionID, callback)
 	{
-		var mapStr = "maps/" + mapCountry + "/regions/" + mapCountry + "." + subregionID + ".topo.json";
+		var mapStr;
+		if (subregionID)
+			mapStr = "maps/" + mapCountry + "/regions/" + mapCountry + "." + regionID + "_" + subregionID + ".topo.json";
+		else if (regionID)
+			mapStr = "maps/" + mapCountry + "/regions/" + mapCountry + "." + regionID + ".topo.json";
+		else
+			mapStr = "maps/" + mapCountry + "/regions/" + mapCountry + ".topo.json";
 		console.log(mapStr);
 		d3.json(mapStr, function(error, regionTopoJson)
 		{
@@ -19,7 +25,7 @@ var regionFuncs = new function()
 				populationJSON = topojson.feature(regionTopoJson, regionTopoJson.objects.population);
 
 			var scaleOverride, finaTopOffset;
-			if (mapCountry == "spain" && (subregionID == "andalucia_almeria" || subregionID == "ceuta_ceuta"))
+			if (mapCountry == "spain" && ((regionID == "andalucia" && subregionID == "almeria") || (regionID == "ceuta" && subregionID == "ceuta")))
 			{
 				var topleftCoordinates, bottomrightCoordinates;
 

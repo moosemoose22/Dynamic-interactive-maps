@@ -35,6 +35,8 @@ var windowManager = new function()
 	this.openRegionWindow = function(data)
 	{
 		var mapCountry = data.properties.ISO.toLowerCase();
+		var storedCountryData = dataHandler.getCountryData(mapCountry);
+
 		calledRegionOpen = true;
 		var id = mapCountry + "_" + data.properties.regionname + "_" + data.properties.subregionname;
 		id = convertID(id);
@@ -53,13 +55,22 @@ var windowManager = new function()
 
 		if (mapCountry == "esp" || mapCountry == "fra" || mapCountry == "and")
 		{
-			var regionName = convertID(latinize(data.properties.regionname).toLowerCase());
-			var subRegionName = convertID(latinize(data.properties.subregionname).toLowerCase());
+			var regionName, subRegionName;
+			// If the smallest admin division is admin 0 or admin 1, we just show the whole country on the big map
+			// For a country that has just admin1 areas, such as Andorra, a user can see those divisions when
+			// s/he clicks on the country
+			if (storedCountryData.adminLevel == "admin0" || storedCountryData.adminLevel == "admin1")
+				;
+			else if (storedCountryData.adminLevel == "admin3")
+			{
+				regionName = convertID(latinize(data.properties.regionname).toLowerCase());
+				subRegionName = convertID(latinize(data.properties.subregionname).toLowerCase());
+			}
 
 			// Once we're done reading the data from the topoJSON file, we add cities
 			// This needs to be done in a callback since reading the file is asynchronous
 			var regionCallback = regionFuncs.addCities;
-			regionFuncs.init(mapCountry, data.properties.regionID, regionName + "_" + subRegionName, regionCallback);
+			regionFuncs.init(mapCountry, regionName, subRegionName, regionCallback);
 		}
 
 		var countryAbbrev = data.properties.ISO;

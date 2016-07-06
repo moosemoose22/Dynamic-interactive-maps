@@ -21,7 +21,9 @@ function getPromisesArr(ids_arr, ID_elem_name, admin_level)
 	{
 		var id = parseInt(idObj[ID_elem_name]);
 		var adminKey = (admin_level == 0) ? "country" : "admin" + admin_level;
-		promises_arr.push(json_funcs.getSubRegionGeometry(adminKey, countryISO, id));
+		promises_arr.push(
+			json_funcs.getSubRegionGeometry(adminKey, countryISO, id)
+		);
 	});
 	return promises_arr;
 }
@@ -36,7 +38,7 @@ function parseSubRegionData(subregionDataArr, admin_level)
 
 		var firstRow = subRegion[0];
 		var fileLoc = json_funcs.subRegionMapFileLocation;
-		
+
 		var JSONFileNamePrefix = countryISO.toLowerCase();
 		if (admin_level > 1)
 			JSONFileNamePrefix += ("." + firstRow["admin1Name"])
@@ -119,7 +121,7 @@ subRegionIDPromise.then(admin2ids => {
 				var subRegionIDPromise3 = json_funcs.hasSubRegionAdmin1IDs(countryISO);
 				subRegionIDPromise3.then(hasCountryIDs => {
 					var admin_level;
-					if (hasCountryIDs["hasadmin1ID"])
+					if (hasCountryIDs[0]["hasadmin1ID"])
 						admin_level = 1;
 					else
 						admin_level = 0;

@@ -11,7 +11,25 @@ BEGIN
 	UPDATE admin2regions SET place_name = 'Gipuzkoa' WHERE place_name = 'Guipúzcoa' AND admin1_id in (select id from admin1regions where place_name like '%Euskadi%' AND country_id = 'ESP');
 	UPDATE admin2regions SET place_name = 'Bizkaia' WHERE place_name = 'Vizcaya' AND admin1_id in (select id from admin1regions where place_name like '%Euskadi%' AND country_id = 'ESP');
 
+	UPDATE countries SET smallest_admin_division = 'admin3' WHERE id in ('FRA','ESP');
+	UPDATE countries SET smallest_admin_division = 'admin1' WHERE id in ('AND');
+	UPDATE countries SET smallest_admin_division = 'admin0' WHERE id in ('MCO');
 	RETURN 1;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_all_country_specs()
+RETURNS TABLE (
+	"countryISO"  char,
+	"countryName"  varchar,
+	"countryAdminDivision"  char(6)
+) AS $$
+BEGIN
+	RETURN QUERY SELECT countries.id as "countryISO", countries.place_name as "countryName", countries.smallest_admin_division AS "countryAdminDivision"
+	FROM countries;
+
+	RETURN;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -100,11 +118,20 @@ DECLARE
 	result_count integer;
 	admin2data RECORD;
 BEGIN
-	SELECT count(place_name) INTO result_count FROM admin2regions WHERE admin1_id IN (SELECT id FROM admin1regions WHERE country_id = country_iso);
+	SELECT count(place_name) INTO result_count FROM admin3regions WHERE admin2_id IN
+	(
+		SELECT id from admin2regions WHERE admin1_id in
+		(
+			SELECT id FROM admin1regions WHERE country_id = country_iso
+		)
+	);
 	IF result_count = 0 THEN 
 		RAISE NOTICE 'No admin2';
 		IF go_up_a_region_on_empty THEN
-			SELECT count(place_name) INTO result_count FROM admin1regions WHERE country_id = country_iso;
+			SELECT count(place_name) INTO result_count from admin2regions WHERE admin1_id in
+			(
+				SELECT id FROM admin1regions WHERE country_id = country_iso
+			);
 			IF result_count = 0 THEN 
 				RAISE NOTICE 'No admin1';
 				SELECT count(place_name) INTO result_count FROM countries WHERE id = country_iso;

@@ -84,12 +84,14 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION region_area_data_adm0(country_iso char(3))
 RETURNS TABLE (
 	"countryName"  varchar,
-	"regionGeom"   text) AS $$
+	"regionGeom"   text,
+	"admin1Name"   varchar) AS $$
 DECLARE
 	result_count integer;
 BEGIN
 	RETURN QUERY (
-		SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin1regions.geometry) AS "regionGeom"
+		SELECT countries.place_name as "countryName", ST_AsGEOJSON(admin1regions.geometry) AS "regionGeom",
+		admin1regions.place_name as "admin1Name"
 		FROM countries
 		INNER JOIN admin1regions ON countries.id = admin1regions.country_id
 		WHERE countries.id = country_iso

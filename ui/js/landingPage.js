@@ -2,21 +2,40 @@ var landingPage = new function()
 {
 	this.init = function()
 	{
-		// wait until map is drawn before writing cities
-		this.writeMap("and");
-		this.writeMap("mco");
-		this.writeMap("fra");
-		this.writeMap("esp", this.writeCities);
+		var serverPromise = serverHandler.requestData("getCountryData");
+		serverPromise.done(function(data)
+		{
+			// If we get server data, set up the map
+			dataHandler.initCountries(data);
+
+			var countryData = dataHandler.getAllCountryData();
+			Object.keys(countryData).forEach(function(countryID, index, array)
+			{
+				landingPage.writeMap(countryID);
+			});
+		})
+		.fail(function() {
+			console.log(data);
+			console.log("error");
+		});
+		// wait until map areas are drawn before adding cities
+		setTimeout(this.initCities, 500);
 	}
 
-	this.writeMap = function(mapCountry, callback)
+	this.initCities = function()
+	{
+		if (dataHandler.allCountriesHaveLoaded())
+			landingPage.writeCities();
+		else
+			setTimeout(landingPage.initCities, 500);
+	}
+
+	this.writeMap = function(mapCountry)
 	{
 		console.log(mapCountry);
 		var mapLoc;
 		var mapLocPrefix = "maps/" + mapCountry + "/" + mapCountry;
-		if (mapCountry == "and")
-			mapLoc = mapLocPrefix + ".adm1.topo.json";
-		else if (mapCountry == "mco")
+		if (mapCountry == "and" || mapCountry == "mco")
 			mapLoc = mapLocPrefix + ".adm0.topo.json";
 		else
 			mapLoc = mapLocPrefix + ".adm2.topo.json";
@@ -57,9 +76,7 @@ var landingPage = new function()
 				.on('click', function(d){
 					windowManager.openRegionWindow(d);
 				});
-			
-			if (callback)
-				callback();
+			dataHandler.countryAreaDataHasLoaded(mapCountry, true);
 		});
 	}
 
