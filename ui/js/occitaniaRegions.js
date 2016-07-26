@@ -180,7 +180,7 @@ var regionFuncs = new function()
 					}
 					else
 						admin3Name = undefined;
-					selectedRegionManager.select(d.properties.regionname, d.properties.subregionname, admin3Name);
+					selectedRegionManager.select(d.properties.Cntry, d.properties.regionname, d.properties.subregionname, admin3Name);
 					selectedRegionManager.writeData();
 				})
 				.on('click', function(d){
@@ -206,7 +206,7 @@ var regionFuncs = new function()
 			.attr("class", "place")
 			.on('mouseover', function(d)
 			{
-				selectedRegionManager.select(d.properties.populregionname, d.properties.populsubregionname, undefined, d.properties.cityname, d.properties.population.toLocaleString());
+				selectedRegionManager.select(d.properties.Cntry, d.properties.populregionname, d.properties.populsubregionname, undefined, d.properties.cityname, d.properties.population.toLocaleString());
 				selectedRegionManager.writeData();
 				$(this.nextSibling.nextSibling).css("fill-opacity", 0.1);
 			})
@@ -265,7 +265,7 @@ var regionFuncs = new function()
 			.style("fill-opacity", 0.01)
 			.on('mouseover', function(d)
 			{
-				selectedRegionManager.select(d.properties.populregionname, d.properties.populsubregionname, undefined, d.properties.cityname, d.properties.population.toLocaleString());
+				selectedRegionManager.select(d.properties.Cntry, d.properties.populregionname, d.properties.populsubregionname, undefined, d.properties.cityname, d.properties.population.toLocaleString());
 				selectedRegionManager.writeData();
 				$(this).css("fill-opacity", 0.1);
 			})

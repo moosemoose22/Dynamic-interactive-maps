@@ -246,6 +246,7 @@ $$ LANGUAGE plpgsql;
 ---------------------------------------------------------
 CREATE OR REPLACE FUNCTION get_landingpage_cities()
 RETURNS TABLE (
+	"countryname"  varchar,
 	"admin1name"  varchar,
 	"admin2name"  varchar,
 	"admin3name"  varchar,
@@ -261,21 +262,22 @@ DECLARE
 BEGIN
 	return QUERY
 	(
-		SELECT a1.place_name, a2.place_name, a3.place_name, city1.place_name as cityname, city1.latitude, city1.longitude, city1.population, city1.capital, city1.text_position
+		SELECT countries.place_name, a1.place_name, a2.place_name, a3.place_name, city1.place_name as cityname, city1.latitude, city1.longitude, city1.population, city1.capital, city1.text_position
 		from cities city1
 		inner join admin3regions a3 on city1.admin3_id = a3.id
 		inner join admin2regions a2 on a3.admin2_id = a2.id
 		inner join admin1regions a1 on a2.admin1_id = a1.id
+		inner join countries on a1.country_id = countries.id
 		WHERE min_zoom < 3
 		UNION
 		-- Query for Andorra that only has admin1 regions
-		SELECT a1.place_name, CAST('' as varchar), CAST('' as varchar), city2.place_name as cityname, city2.latitude, city2.longitude, city2.population, city2.capital, city2.text_position
+		SELECT countries.place_name, a1.place_name, CAST('' as varchar), CAST('' as varchar), city2.place_name as cityname, city2.latitude, city2.longitude, city2.population, city2.capital, city2.text_position
 		from cities city2
 		inner join admin1regions a1 on city2.admin1_id_no_admin2 = a1.id
 		WHERE min_zoom < 3
 		UNION
 		-- Query for Monaco that only has an admin0 region
-		SELECT CAST('' as varchar), CAST('' as varchar), CAST('' as varchar), city3.place_name as cityname, city3.latitude, city3.longitude, city3.population, city3.capital, city3.text_position
+		SELECT countries.place_name, CAST('' as varchar), CAST('' as varchar), CAST('' as varchar), city3.place_name as cityname, city3.latitude, city3.longitude, city3.population, city3.capital, city3.text_position
 		from cities city3
 		inner join countries on city3.country_id_no_admin1 = countries.id
 		WHERE min_zoom < 3

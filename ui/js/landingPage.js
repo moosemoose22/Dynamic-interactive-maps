@@ -70,7 +70,7 @@ var landingPage = new function()
 				.on('mouseover', function(d)
 				{
 					// Put region and subregion name in top corner
-					selectedRegionManager.select(d.properties.regionname, d.properties.subregionname);
+					selectedRegionManager.select(d.properties.Cntry, d.properties.regionname, d.properties.subregionname);
 					selectedRegionManager.writeData();
 				})
 				.on('click', function(d){
@@ -112,7 +112,7 @@ var landingPage = new function()
 				})
 				.on('mouseover', function(d)
 				{
-					selectedRegionManager.select(d.properties.regionname, d.properties.subregionname, d.properties.admin3name, d.properties.cityname, d.properties.population.toLocaleString());
+					selectedRegionManager.select(d.properties.Cntry, d.properties.regionname, d.properties.subregionname, d.properties.admin3name, d.properties.cityname, d.properties.population.toLocaleString());
 					selectedRegionManager.writeData();
 					$(this.nextSibling.nextSibling).css("fill-opacity", 0.1);
 				})
@@ -181,7 +181,7 @@ var landingPage = new function()
 				.style("fill-opacity", 0.01)
 				.on('mouseover', function(d)
 				{
-					selectedRegionManager.select(d.properties.regionname, d.properties.subregionname, d.properties.admin3name, d.properties.cityname, d.properties.population.toLocaleString());
+					selectedRegionManager.select(d.properties.Cntry, d.properties.regionname, d.properties.subregionname, d.properties.admin3name, d.properties.cityname, d.properties.population.toLocaleString());
 					selectedRegionManager.writeData();
 					$(this).css("fill-opacity", 0.1);
 				})

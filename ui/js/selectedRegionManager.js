@@ -9,8 +9,9 @@ var selectedRegionManager = new function()
 	var p_hasCity;
 
 	// Public functions
-	this.select = function(regionAdm1, regionAdm2, regionAdm3, city, population)
+	this.select = function(country, regionAdm1, regionAdm2, regionAdm3, city, population)
 	{
+		p_currentCountry = country;
 		p_currentRegionAdm1 = regionAdm1;
 		p_currentRegionAdm2 = regionAdm2;
 		if (regionAdm3)
@@ -27,8 +28,9 @@ var selectedRegionManager = new function()
 
 	this.writeData = function()
 	{
-		$('#regionName').html(p_currentRegionAdm1);
-		$('#subRegionName').html(p_currentRegionAdm2);
+		$('#countryName').html(p_currentCountry ? p_currentCountry : "");
+		$('#regionName').html(p_currentRegionAdm1 ? p_currentRegionAdm1 : "");
+		$('#subRegionName').html(p_currentRegionAdm2 ? p_currentRegionAdm2 : "");
 		$('#subSubRegionName').html(p_currentRegionAdm3 ? p_currentRegionAdm3 : "");
 		if (p_hasCity)
 			$('#CityName').html(p_currentCity + "  Population: " + p_currentPopulation);

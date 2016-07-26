@@ -71,7 +71,7 @@ function parseSubRegionData(subregionDataArr, admin_level)
 					console.log("File write error: " + err);
 				else
 				{
-					const make_topojson = spawn('topojson', ['-o', TopoJSONFileParam, '--properties Cntry=countryName,regionname=admin1Name,subregionname=admin2Name,admin3name=admin3Name', "region=" + geoJSONFileParam]);
+					const make_topojson = spawn('topojson', ['-o', TopoJSONFileParam, '--properties', 'Cntry=countryName,regionname=admin1Name,subregionname=admin2Name,admin3name=admin3Name', "region=" + geoJSONFileParam]);
 
 					make_topojson.stdout.on('data', (data) => {
 						// Once we've created the topojson, let's delete the GEOJson that isn't being used in the final web product
